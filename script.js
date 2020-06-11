@@ -1,8 +1,8 @@
 var timerEl = document.querySelector("#timer");
-var containerEl = document.querySelector(".container")
+var containerEl = document.querySelector(".container");
 var startBtnEl = document.querySelector("#startBtn");
 var mainContentEl = document.querySelector(".mainContent");
-var answerBarEl = document.querySelector(".answerBar")
+var answerBarEl = document.querySelector(".answerBar");
 var questionEl;
 var answersEl;
 var wrongLine;
@@ -61,7 +61,6 @@ console.log(qArray.length);
 console.log(qArray);
 
 function startQuiz() {
-  countDown = countDown + 15;
   interval = setInterval(function () {
     countDown--;
     timerEl.innerHTML = "Time: " + countDown;
@@ -74,54 +73,68 @@ function startQuiz() {
 
 function renderQuestion() {
   mainContentEl.innerHTML = "";
-  if (questionCount>4){
+  if (questionCount > 4) {
+    clearInterval(interval);
+    timerEl.innerHTML = "Time: " + countDown;
+  } else {
+    questionEl = document.createElement("h4");
+    questionEl.innerText = qArray[questionCount]["question"];
+    mainContentEl.append(questionEl);
 
-  }
-  questionEl = document.createElement("h4");
-  questionEl.innerText = qArray[questionCount]["question"];
-  mainContentEl.append(questionEl);
-
-  console.log(qArray[questionCount]["question"]);
-  for (var i = 0; i < qArray[questionCount]["answers"].length; i++) {
-    answersEl = document.createElement("button");
-    answersEl.innerText = qArray[questionCount]["answers"][i];
-    answersEl.setAttribute("class", "btn-group-vertical quizBtn");
-    answersEl.setAttribute("data-index", i);
-    mainContentEl.appendChild(answersEl);
+    console.log(qArray[questionCount]["question"]);
+    for (var i = 0; i < qArray[questionCount]["answers"].length; i++) {
+      answersEl = document.createElement("button");
+      answersEl.innerText = qArray[questionCount]["answers"][i];
+      answersEl.setAttribute("class", "btn-group-vertical quizBtn");
+      answersEl.setAttribute("data-index", i);
+      mainContentEl.appendChild(answersEl);
+    }
   }
 }
 
+function wrongAnswer() {
+  answerBarEl.innerHTML = "";
+  wrongLine = document.createElement("div");
+  wrongLine.innerText = "Wrong!";
+  wrongLine.setAttribute("class", "answerBar");
+  wrongLine.setAttribute("style", "border-top: lightgray solid 1px");
+  answerBarEl.append(wrongLine);
+  setTimeout(function () {
+    wrongLine.innerHTML = "";
+    wrongLine.setAttribute("style", "border-top: none");
+  }, 1000);
+  countDown = countDown - 15;
+  questionCount++;
+  console.log(questionCount);
+  renderQuestion();
+}
+function rightAnswer() {
+  answerBarEl.innerHTML = "";
+  correctLine = document.createElement("div");
+  correctLine.innerText = "Correct!";
+  correctLine.setAttribute("class", "answerBar");
+  correctLine.setAttribute("style", "border-top: lightgray solid 1px");
+  answerBarEl.append(correctLine);
+  setTimeout(function () {
+    correctLine.innerHTML = "";
+    correctLine.setAttribute("style", "border-top: none");
+  }, 1000);
+  questionCount++;
+  console.log(questionCount);
+  renderQuestion();
+}
+
+startBtnEl.addEventListener("click", startQuiz);
+
 mainContentEl.addEventListener("click", function (event) {
   var element = event.target;
+  console.log(event.target);
   if (element.matches("button")) {
     if (element.dataset.index == qArray[questionCount]["correctAnswer"]) {
       rightAnswer();
+    } else if (!element.hasAttribute("data-index")) {
     } else {
       wrongAnswer();
     }
   }
 });
-
-function wrongAnswer() {
-  wrongLine = document.createElement("div")
-  wrongLine.innerText = "Wrong!"
-  wrongLine.setAttribute("class", "answerBar")  
-  wrongLine.setAttribute("style", "border-top: lightgray solid 1px")
-  answerBarEl.append(wrongLine)
-  setTimeout(function(){
-      wrongLine.innerHTML=""
-      wrongLine.setAttribute("style", "border-top: none")
-  },1000)
-  countDown = countDown - 15;
-  questionCount++;
-  console.log(questionCount)
-  renderQuestion();
-
-}
-function rightAnswer() {
-  questionCount++;
-  console.log(questionCount)
-  renderQuestion();
-}
-
-startBtnEl.addEventListener("click", startQuiz);
