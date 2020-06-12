@@ -156,8 +156,10 @@ function lastRender() {
   lastPgForm.append(lastPgFormLabel);
   lastPgFormInput = document.createElement("input");
   lastPgFormInput.setAttribute("class", "form-control");
+  lastPgFormInput.setAttribute("type","text")
+  lastPgFormInput.setAttribute("pattern","[A-Za-z]{3}")
   lastPgFormInput.setAttribute("id", "formInput");
-  lastPgFormInput.setAttribute("placeholder", "Initials Here");
+  lastPgFormInput.setAttribute("placeholder", "Initials Here (Letters only, 3 Characters Max)");
   lastPgForm.append(lastPgFormInput);
   lastPgBody.append(lastPgForm);
   mainContentEl.append(lastPgHead);
