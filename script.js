@@ -202,10 +202,17 @@ mainContentEl.addEventListener("submit", function () {
   var element = event.target;
   formValue = lastPgFormInput.value;
   if (element.matches("form")) {
+    if(JSON.parse(localStorage.getItem("scoreArr")==null)){
+      scoreArr=[]
+    }else{
     scoreArr = JSON.parse(localStorage.getItem("scoreArr"));
+    }
+    console.log(scoreArr);
+    console.log(formValue)
+    console.log(countDown)
     scoreArr.push(formValue);
     scoreArr.push(countDown);
-    console.log(scoreArr);
+
     localStorage.setItem("scoreArr", JSON.stringify(scoreArr));
     window.location.href = "./highscores.html";
   }
