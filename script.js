@@ -164,8 +164,11 @@ function lastRender() {
 }
 
 function pg2Start() {
+  console.log(scoreAppendDiv)
+  console.log("pg2Start called");
   if (scoreAppendDiv !== null) {
     var localArr = JSON.parse(localStorage.getItem("scoreArr"));
+    scoreAppendDiv.innerHTML=""
     for (i = 0; i < localArr.length; i += 2) {
       var scoreAppend = document.createElement("div");
       scoreAppend.setAttribute("class", "highScores");
@@ -207,3 +210,9 @@ mainContentEl.addEventListener("submit", function () {
     window.location.href = "./highscores.html";
   }
 });
+if (clearScoresBtn !== null) {
+  clearScoresBtn.addEventListener("click", function () {
+    localStorage.setItem("scoreArr", JSON.stringify([]));
+    pg2Start();
+  });
+}
