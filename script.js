@@ -71,7 +71,9 @@ var qArray = [
 var currentQIndex = 0;
 console.log(qArray.length);
 console.log(qArray);
-
+// Startquiz starts the interval count down.
+// Within the interval if the timer hits 0, the interval is stopped,
+//  and the question counter is put to 5 which will trigger the last render.
 function startQuiz() {
   interval = setInterval(function () {
     countDown--;
@@ -84,14 +86,16 @@ function startQuiz() {
   }, 1000);
   renderQuestion();
 }
-
+// This question wipes the screen and repopulates it with the next question.
 function renderQuestion() {
   mainContentEl.innerHTML = "";
+  // If question counter is >4, the function ends the interval and pushes the last render function.
   if (questionCount > 4) {
     clearInterval(interval);
     timerEl.innerHTML = "Time: " + countDown;
     lastRender();
   } else {
+    // questionCount under 4, populates the page with the next question content.
     questionEl = document.createElement("h4");
     questionEl.innerText = qArray[questionCount]["question"];
     mainContentEl.append(questionEl);
@@ -102,13 +106,14 @@ function renderQuestion() {
       answersEl = document.createElement("button");
       answersEl.innerText = qArray[questionCount]["answers"][i];
       answersEl.setAttribute("class", "btn-group-vertical quizBtn");
+      // data index used later for event delegation, determining the correct answer
       answersEl.setAttribute("data-index", i);
       divEl.appendChild(answersEl);
     }
     mainContentEl.append(divEl);
   }
 }
-
+// if wrong answer is picked, 15s taken from timer, wrong! printed below questions for 1s.
 function wrongAnswer() {
   answerBarEl.innerHTML = "";
   wrongLine = document.createElement("div");
@@ -141,6 +146,7 @@ function rightAnswer() {
   console.log(questionCount);
   renderQuestion();
 }
+// This is run after quiz is done or failed. Pastes on last page of content.
 function lastRender() {
   lastPgHead = document.createElement("h4");
   lastPgHead.setAttribute("class", "mainContent");
@@ -156,21 +162,24 @@ function lastRender() {
   lastPgForm.append(lastPgFormLabel);
   lastPgFormInput = document.createElement("input");
   lastPgFormInput.setAttribute("class", "form-control");
-  lastPgFormInput.setAttribute("type","text")
-  lastPgFormInput.setAttribute("pattern","[A-Za-z]{3}")
+  lastPgFormInput.setAttribute("type", "text");
+  lastPgFormInput.setAttribute("pattern", "[A-Za-z]{3}");
   lastPgFormInput.setAttribute("id", "formInput");
-  lastPgFormInput.setAttribute("placeholder", "Initials Here (Letters only, 3 Characters Max)");
+  lastPgFormInput.setAttribute(
+    "placeholder",
+    "Initials Here (Letters only, 3 Characters Max)"
+  );
   lastPgForm.append(lastPgFormInput);
   lastPgBody.append(lastPgForm);
   mainContentEl.append(lastPgHead);
 }
-
+// function called for the highscores page. Pastes the high scores that have been stored.
 function pg2Start() {
-  console.log(scoreAppendDiv)
+  console.log(scoreAppendDiv);
   console.log("pg2Start called");
   if (scoreAppendDiv !== null) {
     var localArr = JSON.parse(localStorage.getItem("scoreArr"));
-    scoreAppendDiv.innerHTML=""
+    scoreAppendDiv.innerHTML = "";
     for (i = 0; i < localArr.length; i += 2) {
       var scoreAppend = document.createElement("div");
       scoreAppend.setAttribute("class", "highScores");
@@ -185,7 +194,7 @@ pg2Start();
 if (startBtnEl !== null) {
   startBtnEl.addEventListener("click", startQuiz);
 }
-
+// Function checks if answer selected is right or wrong comparing data index with correct answer index.
 mainContentEl.addEventListener("click", function (event) {
   var element = event.target;
   console.log(event.target);
@@ -198,20 +207,20 @@ mainContentEl.addEventListener("click", function (event) {
     }
   }
 });
-
+// Function stores new initials in local storage. switches to highscores html page.
 mainContentEl.addEventListener("submit", function () {
   event.preventDefault();
   var element = event.target;
   formValue = lastPgFormInput.value;
   if (element.matches("form")) {
-    if(JSON.parse(localStorage.getItem("scoreArr")==null)){
-      scoreArr=[]
-    }else{
-    scoreArr = JSON.parse(localStorage.getItem("scoreArr"));
+    if (JSON.parse(localStorage.getItem("scoreArr") == null)) {
+      scoreArr = [];
+    } else {
+      scoreArr = JSON.parse(localStorage.getItem("scoreArr"));
     }
     console.log(scoreArr);
-    console.log(formValue)
-    console.log(countDown)
+    console.log(formValue);
+    console.log(countDown);
     scoreArr.push(formValue);
     scoreArr.push(countDown);
 
@@ -219,6 +228,7 @@ mainContentEl.addEventListener("submit", function () {
     window.location.href = "./highscores.html";
   }
 });
+// cleares local storage, re-renders high scores list.
 if (clearScoresBtn !== null) {
   clearScoresBtn.addEventListener("click", function () {
     localStorage.setItem("scoreArr", JSON.stringify([]));
