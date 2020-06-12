@@ -3,6 +3,18 @@ var containerEl = document.querySelector(".container");
 var startBtnEl = document.querySelector("#startBtn");
 var mainContentEl = document.querySelector(".mainContent");
 var answerBarEl = document.querySelector(".answerBar");
+var goBackBtnEl = document.querySelector("#goBackBtn");
+var clearScoresBtn = document.querySelector("#clearScores");
+var viewHSBtnEl = document.querySelector("#viewHSBtn");
+var scoreAppendDiv = document.querySelector("#scoresAppend");
+var lastPgHead;
+var scoreArr = [];
+var formValue;
+var divEl;
+var lastPgBody;
+var lastPgForm;
+var lastPgFormLabel;
+var lastPgFormInput;
 var questionEl;
 var answersEl;
 var wrongLine;
@@ -66,6 +78,8 @@ function startQuiz() {
     timerEl.innerHTML = "Time: " + countDown;
     if (countDown <= 0) {
       clearInterval(interval);
+      questionCount = 5;
+      renderQuestion();
     }
   }, 1000);
   renderQuestion();
@@ -76,19 +90,22 @@ function renderQuestion() {
   if (questionCount > 4) {
     clearInterval(interval);
     timerEl.innerHTML = "Time: " + countDown;
+    lastRender();
   } else {
     questionEl = document.createElement("h4");
     questionEl.innerText = qArray[questionCount]["question"];
     mainContentEl.append(questionEl);
-
+    divEl = document.createElement("div");
+    divEl.setAttribute("class", "divEl btn-group-vertical");
     console.log(qArray[questionCount]["question"]);
     for (var i = 0; i < qArray[questionCount]["answers"].length; i++) {
       answersEl = document.createElement("button");
       answersEl.innerText = qArray[questionCount]["answers"][i];
       answersEl.setAttribute("class", "btn-group-vertical quizBtn");
       answersEl.setAttribute("data-index", i);
-      mainContentEl.appendChild(answersEl);
+      divEl.appendChild(answersEl);
     }
+    mainContentEl.append(divEl);
   }
 }
 
@@ -108,6 +125,7 @@ function wrongAnswer() {
   console.log(questionCount);
   renderQuestion();
 }
+// Function to execute when right answer is selected: correct bar flashes and it moves to next with no deduction
 function rightAnswer() {
   answerBarEl.innerHTML = "";
   correctLine = document.createElement("div");
@@ -123,8 +141,48 @@ function rightAnswer() {
   console.log(questionCount);
   renderQuestion();
 }
+function lastRender() {
+  lastPgHead = document.createElement("h4");
+  lastPgHead.setAttribute("class", "mainContent");
+  lastPgHead.innerText = "All Done!";
+  lastPgBody = document.createElement("div");
+  lastPgBody.innerText = "Your final score is: " + countDown;
+  lastPgBody.setAttribute("style", "font-weight: normal");
+  lastPgHead.append(lastPgBody);
+  lastPgForm = document.createElement("form");
+  lastPgForm.setAttribute("style", "padding: 20px");
+  lastPgFormLabel = document.createElement("label");
+  lastPgFormLabel.innerText = "Enter Initials:";
+  lastPgForm.append(lastPgFormLabel);
+  lastPgFormInput = document.createElement("input");
+  lastPgFormInput.setAttribute("class", "form-control");
+  lastPgFormInput.setAttribute("id", "formInput");
+  lastPgFormInput.setAttribute("placeholder", "Initials Here");
+  lastPgForm.append(lastPgFormInput);
+  lastPgBody.append(lastPgForm);
+  mainContentEl.append(lastPgHead);
+}
 
-startBtnEl.addEventListener("click", startQuiz);
+function pg2Start() {
+  console.log(scoreAppendDiv)
+  console.log("pg2Start called");
+  if (scoreAppendDiv !== null) {
+    var localArr = JSON.parse(localStorage.getItem("scoreArr"));
+    scoreAppendDiv.innerHTML=""
+    for (i = 0; i < localArr.length; i += 2) {
+      var scoreAppend = document.createElement("div");
+      scoreAppend.setAttribute("class", "highScores");
+      scoreAppend.innerText =
+        i / 2 + 1 + ". " + localArr[i] + " Score " + localArr[i + 1];
+      scoreAppendDiv.append(scoreAppend);
+    }
+  }
+}
+pg2Start();
+
+if (startBtnEl !== null) {
+  startBtnEl.addEventListener("click", startQuiz);
+}
 
 mainContentEl.addEventListener("click", function (event) {
   var element = event.target;
@@ -138,3 +196,23 @@ mainContentEl.addEventListener("click", function (event) {
     }
   }
 });
+
+mainContentEl.addEventListener("submit", function () {
+  event.preventDefault();
+  var element = event.target;
+  formValue = lastPgFormInput.value;
+  if (element.matches("form")) {
+    scoreArr = JSON.parse(localStorage.getItem("scoreArr"));
+    scoreArr.push(formValue);
+    scoreArr.push(countDown);
+    console.log(scoreArr);
+    localStorage.setItem("scoreArr", JSON.stringify(scoreArr));
+    window.location.href = "./highscores.html";
+  }
+});
+if (clearScoresBtn !== null) {
+  clearScoresBtn.addEventListener("click", function () {
+    localStorage.setItem("scoreArr", JSON.stringify([]));
+    pg2Start();
+  });
+}
