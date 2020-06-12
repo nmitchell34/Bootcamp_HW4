@@ -3,12 +3,14 @@ var containerEl = document.querySelector(".container");
 var startBtnEl = document.querySelector("#startBtn");
 var mainContentEl = document.querySelector(".mainContent");
 var answerBarEl = document.querySelector(".answerBar");
-var goBackBtnEl = document.querySelector("#goBackBtn")
-var clearScoresBtn = document.querySelector("#clearScores")
-var viewHSBtnEl=document.querySelector("#viewHSBtn")
-var formInputEl=document.querySelector("#formInput")
+var goBackBtnEl = document.querySelector("#goBackBtn");
+var clearScoresBtn = document.querySelector("#clearScores");
+var viewHSBtnEl = document.querySelector("#viewHSBtn");
+var scoreAppendDiv = document.querySelector("#scoresAppend");
 var lastPgHead;
-var divEl
+var scoreArr = [];
+var formValue;
+var divEl;
 var lastPgBody;
 var lastPgForm;
 var lastPgFormLabel;
@@ -76,8 +78,8 @@ function startQuiz() {
     timerEl.innerHTML = "Time: " + countDown;
     if (countDown <= 0) {
       clearInterval(interval);
-      questionCount=5
-      renderQuestion()
+      questionCount = 5;
+      renderQuestion();
     }
   }, 1000);
   renderQuestion();
@@ -93,8 +95,8 @@ function renderQuestion() {
     questionEl = document.createElement("h4");
     questionEl.innerText = qArray[questionCount]["question"];
     mainContentEl.append(questionEl);
-    divEl=document.createElement("div")
-    divEl.setAttribute("class","divEl btn-group-vertical")
+    divEl = document.createElement("div");
+    divEl.setAttribute("class", "divEl btn-group-vertical");
     console.log(qArray[questionCount]["question"]);
     for (var i = 0; i < qArray[questionCount]["answers"].length; i++) {
       answersEl = document.createElement("button");
@@ -102,9 +104,8 @@ function renderQuestion() {
       answersEl.setAttribute("class", "btn-group-vertical quizBtn");
       answersEl.setAttribute("data-index", i);
       divEl.appendChild(answersEl);
-
     }
-    mainContentEl.append(divEl)
+    mainContentEl.append(divEl);
   }
 }
 
@@ -148,7 +149,6 @@ function lastRender() {
   lastPgBody.innerText = "Your final score is: " + countDown;
   lastPgBody.setAttribute("style", "font-weight: normal");
   lastPgHead.append(lastPgBody);
-
   lastPgForm = document.createElement("form");
   lastPgForm.setAttribute("style", "padding: 20px");
   lastPgFormLabel = document.createElement("label");
@@ -156,16 +156,30 @@ function lastRender() {
   lastPgForm.append(lastPgFormLabel);
   lastPgFormInput = document.createElement("input");
   lastPgFormInput.setAttribute("class", "form-control");
-  lastPgFormInput.setAttribute("id", "formInput")
-  lastPgFormInput.setAttribute("placeholder", "Initials Here")
+  lastPgFormInput.setAttribute("id", "formInput");
+  lastPgFormInput.setAttribute("placeholder", "Initials Here");
   lastPgForm.append(lastPgFormInput);
   lastPgBody.append(lastPgForm);
   mainContentEl.append(lastPgHead);
 }
 
+function pg2Start() {
+  if (scoreAppendDiv !== null) {
+    var localArr = JSON.parse(localStorage.getItem("scoreArr"));
+    for (i = 0; i < localArr.length; i += 2) {
+      var scoreAppend = document.createElement("div");
+      scoreAppend.setAttribute("class", "highScores");
+      scoreAppend.innerText =
+        i / 2 + 1 + ". " + localArr[i] + " Score " + localArr[i + 1];
+      scoreAppendDiv.append(scoreAppend);
+    }
+  }
+}
+pg2Start();
 
-
-startBtnEl.addEventListener("click", startQuiz);
+if (startBtnEl !== null) {
+  startBtnEl.addEventListener("click", startQuiz);
+}
 
 mainContentEl.addEventListener("click", function (event) {
   var element = event.target;
@@ -180,8 +194,16 @@ mainContentEl.addEventListener("click", function (event) {
   }
 });
 
-
-formInputEl.addEventListener("submit", function(){
-  console.log(THIS WORKS)
-})
-
+mainContentEl.addEventListener("submit", function () {
+  event.preventDefault();
+  var element = event.target;
+  formValue = lastPgFormInput.value;
+  if (element.matches("form")) {
+    scoreArr = JSON.parse(localStorage.getItem("scoreArr"));
+    scoreArr.push(formValue);
+    scoreArr.push(countDown);
+    console.log(scoreArr);
+    localStorage.setItem("scoreArr", JSON.stringify(scoreArr));
+    window.location.href = "./highscores.html";
+  }
+});
